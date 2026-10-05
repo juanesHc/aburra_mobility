@@ -1,0 +1,33 @@
+# Datos: nada se versiona. El microdato de la EOD tiene acuerdo de uso con AMVA.
+data/raw/*
+data/processed/*
+!data/**/.gitkeep
+
+# SUMO: artefactos pesados y regenerables.
+*.net.xml
+*.rou.xml
+*.rou.alt.xml
+*.trips.xml
+*.osm
+*.osm.pbf
+# osmGet.py escribe <prefijo>_city.osm.xml, que '*.osm' no cubre.
+*.osm.xml
+*.osm.xml.gz
+data/osm/
+*.log
+scenarios/prueba_tecnica/*_estadisticas.xml
+output/
+# Excepcion: los tipos de vehiculo son chicos y son decisiones de modelado.
+!*.add.xml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editores y sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

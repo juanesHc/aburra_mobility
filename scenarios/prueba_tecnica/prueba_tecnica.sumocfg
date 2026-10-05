@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Configuracion de PRUEBA TECNICA. Ver la advertencia en demanda_sintetica.rou.xml -->
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+    <input>
+        <net-file value="../redes/barbosa_bello_caldas_copacabana_envigado_girardota_itagui_la_estrella_medellin_sabaneta.net.xml"/>
+        <route-files value="demanda_sintetica.rou.xml"/>
+        <additional-files value="../vtypes.add.xml"/>
+    </input>
+    <time>
+        <begin value="18000"/>
+        <end value="36000"/>
+        <step-length value="1.0"/>
+    </time>
+    <processing>
+        <!-- Habilita el modelo sublane, que es lo que permite a la moto
+             filtrarse entre carriles. Sin esto los parametros latAlignment
+             y minGapLat de vtypes.add.xml se ignoran por completo. -->
+        <lateral-resolution value="0.8"/>
+        <ignore-route-errors value="true"/>
+        <time-to-teleport value="300"/>
+    </processing>
+    <report>
+        <verbose value="true"/>
+        <no-step-log value="true"/>
+        <duration-log.statistics value="true"/>
+    </report>
+</configuration>
