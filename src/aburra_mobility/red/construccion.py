@@ -7,7 +7,8 @@ from pathlib import Path
 from .aristas import carriles_por_defecto, km
 from .calidad import DatosReporte, advertencias_al_cargar, escribir_reporte, supuestos_red
 from .conectividad import aristas_de_borde, analizar_conectividad
-from .conversion_osm import ANCHO_CARRIL_COMPARTIDO, ajustar_red, carriles_compartidos, convertir
+from .conversion_osm import (ANCHO_CARRIL_COMPARTIDO, ajustar_red, carriles_compartidos, convertir,
+                             salidas_de_glorieta)
 from .datos_osm import leer_osm
 from .descarga_osm import obtener_osm
 from ..errores import ErrorPipeline
@@ -50,9 +51,11 @@ def construir_red_osm(municipios: list[Municipio], carpeta_osm: Path, carpeta_re
           f"el mayor fuerte tiene {len(conect.fuertes[0])} de "
           f"{len(net_sin_podar.getEdges())} aristas")
     compartidos = carriles_compartidos(net_sin_podar, excluir=conect.podar)
-    ajustar_red(sin_podar, red, conect.podar, compartidos, log)
+    salidas = salidas_de_glorieta(net_sin_podar, excluir=conect.podar)
+    ajustar_red(sin_podar, red, conect.podar, compartidos, salidas, log)
     print(f"  {len(conect.podar)} aristas podadas, {len(compartidos)} con carril "
-          f"compartido ensanchadas a {ANCHO_CARRIL_COMPARTIDO} m -> {red.name}")
+          f"compartido ensanchadas a {ANCHO_CARRIL_COMPARTIDO} m, {len(salidas)} salidas de "
+          f"glorieta habilitadas desde el segundo carril -> {red.name}")
 
     net = sumolib.net.readNet(str(red), withPrograms=True)
     residual = analizar_conectividad(net).podar
@@ -63,7 +66,8 @@ def construir_red_osm(municipios: list[Municipio], carpeta_osm: Path, carpeta_re
     datos = DatosReporte(
         municipios=municipios, clave=clave, osms=osms, red=red, red_sin_podar=sin_podar,
         net=net, net_sin_podar=net_sin_podar, resumen_osm=leer_osm(osms),
-        conectividad=conect, ensanchadas=sorted(compartidos), salida_netconvert=salida,
+        conectividad=conect, ensanchadas=sorted(compartidos), salidas_glorieta=salidas,
+        salida_netconvert=salida,
         adivinar_semaforos=adivinar_semaforos,
         advertencias_carga=advertencias_al_cargar(red),
         supuestos=supuestos_red(adivinar_semaforos),

@@ -34,6 +34,7 @@ class DatosReporte:
     resumen_osm: ResumenOSM
     conectividad: Conectividad
     ensanchadas: list[str]
+    salidas_glorieta: list[tuple[str, str, int, int]]
     salida_netconvert: str
     adivinar_semaforos: bool
     advertencias_carga: list[str]
@@ -337,6 +338,30 @@ def _seccion_conectividad(d: DatosReporte) -> list[str]:
     return L
 
 
+def _seccion_glorietas(d: DatosReporte) -> list[str]:
+    glorietas = d.net_sin_podar.getRoundabouts()
+    varias = [r for r in glorietas
+              if max(d.net_sin_podar.getEdge(e).getLaneNumber() for e in r.getEdges()) >= 2]
+    nombres = Counter(d.net_sin_podar.getEdge(a).getName() or "(sin nombre)"
+                      for a, _, _, _ in d.salidas_glorieta)
+    L = ["## Salidas de glorieta", ""]
+    L += _tabla(["", "valor"], [
+        ["Glorietas en la red", len(glorietas)],
+        ["Glorietas de dos o más carriles", len(varias)],
+        ["Salidas habilitadas también desde el segundo carril", len(d.salidas_glorieta)],
+    ])
+    L += ["netconvert solo permite salir de una glorieta desde el carril exterior. En las de",
+          "varios carriles, un vehículo que va por el segundo carril tiene que cambiarse en el",
+          "tramo del anillo antes de su salida, que a veces mide menos de 10 m, y termina en",
+          "una frenada de emergencia. En las glorietas del valle se sale también desde el",
+          "segundo carril, así que esas salidas se habilitan desde ahí (ver el supuesto",
+          "`salidas_glorieta`). Desde el tercer carril no se habilita.", ""]
+    if nombres:
+        L += ["Glorietas con más salidas habilitadas: "
+              + ", ".join(f"{n} ({k})" for n, k in nombres.most_common(8)) + ".", ""]
+    return L
+
+
 def _seccion_bordes(d: DatosReporte) -> list[str]:
     ent, sal = aristas_de_borde(d.net)
     L = ["## Aristas de entrada y salida (`is_fringe`)", ""]
@@ -419,6 +444,7 @@ def escribir_reporte(destino: Path, d: DatosReporte) -> tuple[Semaforos, dict[st
         + _seccion_semaforos(d, sem)
         + _seccion_giros(d)
         + _seccion_conectividad(d)
+        + _seccion_glorietas(d)
         + _seccion_bordes(d)
         + _seccion_advertencias(d)
         + ["## Supuestos tomados", ""] + d.supuestos.markdown()
@@ -495,5 +521,13 @@ def supuestos_red(adivinar_semaforos: bool) -> RegistroSupuestos:
         "Se eliminan las aristas que no estan en ningun camino que pase por el "
         "componente fuertemente conexo principal. Si alguna era una via real mal "
         "conectada en OSM, su demanda se pierde hasta que se corrija el dato.",
+    )
+    s.agregar(
+        "salidas_glorieta",
+        "En las glorietas de dos o mas carriles, las salidas que netconvert solo "
+        "permite desde el carril exterior se habilitan tambien desde el segundo. "
+        "Desde el tercero no se habilitan. Esto aproxima como se conduce en el "
+        "valle (por ejemplo, la Rotonda de Laureles); no viene de un dato y "
+        "habria que confirmarlo con las señales y marcas viales reales.",
     )
     return s

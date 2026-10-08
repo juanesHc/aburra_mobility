@@ -90,11 +90,10 @@ def escribir_vtypes(cuotas: dict, destino: Path, supuestos: RegistroSupuestos):
       reemplazarse por especificaciones reales de la flota objetivo.
     -->
     <vType id="auto_bev" vClass="passenger" length="4.3" minGap="2.5" maxSpeed="45.0"
-           emissionClass="Energy" color="0.1,0.7,0.3">
+           emissionClass="Energy" mass="1600" color="0.1,0.7,0.3">
         <param key="has.battery.device" value="true"/>
         <param key="maximumBatteryCapacity" value="50000"/>
         <param key="maximumPower" value="100000"/>
-        <param key="vehicleMass" value="1600"/>
         <param key="frontSurfaceArea" value="2.6"/>
         <param key="airDragCoefficient" value="0.35"/>
         <param key="rollDragCoefficient" value="0.01"/>

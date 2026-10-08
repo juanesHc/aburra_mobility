@@ -559,6 +559,23 @@ Islas: 200 aristas, 88.84 km, en estas vías OSM. Revisar en netedit o corregir 
 - [62228930](https://www.openstreetmap.org/way/62228930), [172999668](https://www.openstreetmap.org/way/172999668), [172999670](https://www.openstreetmap.org/way/172999670), [176994955](https://www.openstreetmap.org/way/176994955), [185660054](https://www.openstreetmap.org/way/185660054), [185660625](https://www.openstreetmap.org/way/185660625), [222665941](https://www.openstreetmap.org/way/222665941), [222665944](https://www.openstreetmap.org/way/222665944), [253852289](https://www.openstreetmap.org/way/253852289), [253874849](https://www.openstreetmap.org/way/253874849), [440529002](https://www.openstreetmap.org/way/440529002), [440529006](https://www.openstreetmap.org/way/440529006), [440529009](https://www.openstreetmap.org/way/440529009), [485603895](https://www.openstreetmap.org/way/485603895), [485603896](https://www.openstreetmap.org/way/485603896), [485603897](https://www.openstreetmap.org/way/485603897), [485606800](https://www.openstreetmap.org/way/485606800), [485606801](https://www.openstreetmap.org/way/485606801), [485606802](https://www.openstreetmap.org/way/485606802), [533073068](https://www.openstreetmap.org/way/533073068), [533073070](https://www.openstreetmap.org/way/533073070), [533073071](https://www.openstreetmap.org/way/533073071), [533073074](https://www.openstreetmap.org/way/533073074), [533073093](https://www.openstreetmap.org/way/533073093), [533073094](https://www.openstreetmap.org/way/533073094), [533073098](https://www.openstreetmap.org/way/533073098), [548427461](https://www.openstreetmap.org/way/548427461), [548427462](https://www.openstreetmap.org/way/548427462), [548427463](https://www.openstreetmap.org/way/548427463), [548787965](https://www.openstreetmap.org/way/548787965), [548787966](https://www.openstreetmap.org/way/548787966), [549843249](https://www.openstreetmap.org/way/549843249), [549843250](https://www.openstreetmap.org/way/549843250), [551360222](https://www.openstreetmap.org/way/551360222), [551360230](https://www.openstreetmap.org/way/551360230), [552231576](https://www.openstreetmap.org/way/552231576), [552231577](https://www.openstreetmap.org/way/552231577), [552231578](https://www.openstreetmap.org/way/552231578), [560763516](https://www.openstreetmap.org/way/560763516), [571721526](https://www.openstreetmap.org/way/571721526), [571721527](https://www.openstreetmap.org/way/571721527), [571721530](https://www.openstreetmap.org/way/571721530), [626743027](https://www.openstreetmap.org/way/626743027), [914667947](https://www.openstreetmap.org/way/914667947), [914667948](https://www.openstreetmap.org/way/914667948), [914699849](https://www.openstreetmap.org/way/914699849), [914699850](https://www.openstreetmap.org/way/914699850), [1017763600](https://www.openstreetmap.org/way/1017763600), [1017816788](https://www.openstreetmap.org/way/1017816788), [1017816789](https://www.openstreetmap.org/way/1017816789), [1018913291](https://www.openstreetmap.org/way/1018913291), [1018913292](https://www.openstreetmap.org/way/1018913292), [1020815166](https://www.openstreetmap.org/way/1020815166), [1067543750](https://www.openstreetmap.org/way/1067543750), [1077898733](https://www.openstreetmap.org/way/1077898733), [1077904239](https://www.openstreetmap.org/way/1077904239), [1078371698](https://www.openstreetmap.org/way/1078371698), [1078371699](https://www.openstreetmap.org/way/1078371699), [1078371700](https://www.openstreetmap.org/way/1078371700), [1078371701](https://www.openstreetmap.org/way/1078371701)
 - … y 15 más
 
+## Salidas de glorieta
+
+|  | valor |
+|---|---:|
+| Glorietas en la red | 151 |
+| Glorietas de dos o más carriles | 63 |
+| Salidas habilitadas también desde el segundo carril | 182 |
+
+netconvert solo permite salir de una glorieta desde el carril exterior. En las de
+varios carriles, un vehículo que va por el segundo carril tiene que cambiarse en el
+tramo del anillo antes de su salida, que a veces mide menos de 10 m, y termina en
+una frenada de emergencia. En las glorietas del valle se sale también desde el
+segundo carril, así que esas salidas se habilitan desde ahí (ver el supuesto
+`salidas_glorieta`). Desde el tercer carril no se habilita.
+
+Glorietas con más salidas habilitadas: (sin nombre) (118), Avenida de Las Palmas (6), Glorieta Pilsen (6), Rotonda Bulerías (5), Rotonda Laureles (4), Rotonda Mayorca (4), Rotonda Santa Gema (4), Rotonda Palma de Mayorca (3).
+
 ## Aristas de entrada y salida (`is_fringe`)
 
 |  | entradas | salidas |
@@ -638,3 +655,7 @@ La red no tiene elevacion: OSM casi no trae 'ele' y no se cargo un modelo digita
 ### 9. `poda_conectividad`
 
 Se eliminan las aristas que no estan en ningun camino que pase por el componente fuertemente conexo principal. Si alguna era una via real mal conectada en OSM, su demanda se pierde hasta que se corrija el dato.
+
+### 10. `salidas_glorieta`
+
+En las glorietas de dos o mas carriles, las salidas que netconvert solo permite desde el carril exterior se habilitan tambien desde el segundo. Desde el tercero no se habilitan. Esto aproxima como se conduce en el valle (por ejemplo, la Rotonda de Laureles); no viene de un dato y habria que confirmarlo con las señales y marcas viales reales.

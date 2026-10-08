@@ -149,6 +149,23 @@ Islas: 14 aristas, 2.90 km, en estas vías OSM. Revisar en netedit o corregir en
 
 - [915029783](https://www.openstreetmap.org/way/915029783), [915029784](https://www.openstreetmap.org/way/915029784), [915029785](https://www.openstreetmap.org/way/915029785), [1031597073](https://www.openstreetmap.org/way/1031597073)
 
+## Salidas de glorieta
+
+|  | valor |
+|---|---:|
+| Glorietas en la red | 7 |
+| Glorietas de dos o más carriles | 3 |
+| Salidas habilitadas también desde el segundo carril | 10 |
+
+netconvert solo permite salir de una glorieta desde el carril exterior. En las de
+varios carriles, un vehículo que va por el segundo carril tiene que cambiarse en el
+tramo del anillo antes de su salida, que a veces mide menos de 10 m, y termina en
+una frenada de emergencia. En las glorietas del valle se sale también desde el
+segundo carril, así que esas salidas se habilitan desde ahí (ver el supuesto
+`salidas_glorieta`). Desde el tercer carril no se habilita.
+
+Glorietas con más salidas habilitadas: (sin nombre) (4), Rotonda El Carmelo II (3), Rotonda Mayorca (3).
+
 ## Aristas de entrada y salida (`is_fringe`)
 
 |  | entradas | salidas |
@@ -228,3 +245,7 @@ La red no tiene elevacion: OSM casi no trae 'ele' y no se cargo un modelo digita
 ### 9. `poda_conectividad`
 
 Se eliminan las aristas que no estan en ningun camino que pase por el componente fuertemente conexo principal. Si alguna era una via real mal conectada en OSM, su demanda se pierde hasta que se corrija el dato.
+
+### 10. `salidas_glorieta`
+
+En las glorietas de dos o mas carriles, las salidas que netconvert solo permite desde el carril exterior se habilitan tambien desde el segundo. Desde el tercero no se habilitan. Esto aproxima como se conduce en el valle (por ejemplo, la Rotonda de Laureles); no viene de un dato y habria que confirmarlo con las señales y marcas viales reales.

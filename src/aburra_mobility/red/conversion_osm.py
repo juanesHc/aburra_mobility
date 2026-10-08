@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import subprocess
 import tempfile
+from collections import defaultdict
 from pathlib import Path
 
 from ..entorno import sumo_home
@@ -80,10 +81,39 @@ def carriles_compartidos(net, excluir: set[str] = frozenset()) -> dict[str, list
             if e.getID() not in excluir and any(l.getWidth() < ANCHO_AUTO for l in e.getLanes())}
 
 
+def salidas_de_glorieta(net, excluir: set[str] = frozenset()) -> list[tuple[str, str, int, int]]:
+    """Salidas de glorieta que solo se toman desde el carril exterior, como (desde, hacia, carril, carril_destino)."""
+    anillo = {eid for r in net.getRoundabouts() for eid in r.getEdges()}
+    nuevas = []
+    for eid in sorted(anillo - excluir):
+        e = net.getEdge(eid)
+        if e.getLaneNumber() < 2 or not e.getLanes()[1].allows("passenger"):
+            continue
+        carriles, hacia = defaultdict(set), {}
+        for l in e.getLanes():
+            for c in l.getOutgoing():
+                destino = c.getTo().getID()
+                if destino in anillo or destino in excluir:
+                    continue
+                carriles[destino].add(l.getIndex())
+                if l.getIndex() == 0:
+                    hacia[destino] = c.getToLane().getIndex()
+        for destino, desde in sorted(carriles.items()):
+            if desde == {0}:
+                ultimo = net.getEdge(destino).getLaneNumber() - 1
+                nuevas.append((eid, destino, 1, min(hacia[destino] + 1, ultimo)))
+    return nuevas
+
+
 def ajustar_red(sin_podar: Path, red: Path, a_quitar: set[str],
-                a_ensanchar: dict[str, list[int]], log: Path):
-    """Segunda pasada de netconvert: poda aristas y ensancha carriles compartidos."""
+                a_ensanchar: dict[str, list[int]], a_conectar: list[tuple[str, str, int, int]],
+                log: Path):
+    """Segunda pasada de netconvert: poda, ensancha carriles compartidos y agrega salidas de glorieta."""
     with tempfile.TemporaryDirectory() as tmp:
+        conexiones = Path(tmp) / "salidas_glorieta.con.xml"
+        conexiones.write_text("<connections>\n" + "".join(
+            f'    <connection from="{a}" to="{b}" fromLane="{i}" toLane="{j}"/>\n'
+            for a, b, i, j in a_conectar) + "</connections>\n", encoding="utf-8")
         lista = Path(tmp) / "aristas_a_podar.txt"
         lista.write_text("\n".join(sorted(a_quitar)), encoding="utf-8")
         parche = Path(tmp) / "anchos.edg.xml"
@@ -94,6 +124,7 @@ def ajustar_red(sin_podar: Path, red: Path, a_quitar: set[str],
             for eid, carriles in sorted(a_ensanchar.items())) + "</edges>\n", encoding="utf-8")
         cmd = ["netconvert", "--sumo-net-file", str(sin_podar),
                "--edge-files", str(parche),
+               "--connection-files", str(conexiones),
                "--remove-edges.input-file", str(lista),
                "--remove-edges.isolated",
                "--output-file", str(red)]
