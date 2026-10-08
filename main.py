@@ -6,7 +6,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
 from aburra_mobility import entorno, etapas, rutas
 from aburra_mobility.errores import ErrorPipeline
-from aburra_mobility.red.municipios import POR_DEFECTO, buscar_municipios, clave_red
+from aburra_mobility.red.municipios import POR_DEFECTO, VALLE, buscar_municipios, clave_red, es_valle_completo
 
 
 def _cmd_verificar(a):
@@ -29,8 +29,10 @@ def _cmd_insumos(a):
 
 def _cmd_red(a):
     etapas.construir_red(a.municipios, a.osm, a.descargar, a.adivinar_semaforos)
-    claves = " ".join(m.clave for m in buscar_municipios(a.municipios))
-    return f"prueba-tecnica --municipio {claves}"
+    municipios = buscar_municipios(a.municipios)
+    if es_valle_completo(municipios):
+        return "prueba-tecnica --valle"
+    return "prueba-tecnica --municipio " + " ".join(m.clave for m in municipios)
 
 
 def _red_elegida(a):
@@ -38,6 +40,8 @@ def _red_elegida(a):
         return None
     if a.red:
         return a.red.resolve()
+    if a.valle:
+        return rutas.red_municipio(clave_red(buscar_municipios([VALLE])))
     return rutas.red_municipio(clave_red(buscar_municipios(a.municipio)))
 
 
@@ -91,7 +95,7 @@ def construir_parser() -> argparse.ArgumentParser:
     r = sub.add_parser("construir-red", help="OpenStreetMap -> red SUMO + reporte de calidad")
     r.add_argument("municipios", nargs="*", default=[POR_DEFECTO], metavar="municipio",
                    help="uno o varios municipios del valle; varios se unen en una sola "
-                        f"red conectada (por defecto: {POR_DEFECTO})")
+                        f"red conectada; '{VALLE}' son los diez (por defecto: {POR_DEFECTO})")
     r.add_argument("--osm", type=Path, metavar="ARCHIVO",
                    help="usar un .osm local en vez del cache o la descarga")
     r.add_argument("--descargar", action="store_true",
@@ -104,7 +108,9 @@ def construir_parser() -> argparse.ArgumentParser:
     cual = t.add_mutually_exclusive_group()
     cual.add_argument("--municipio", nargs="+", default=[POR_DEFECTO],
                       help="usar la red OSM de este municipio o de esta union de "
-                           f"municipios (por defecto: {POR_DEFECTO})")
+                           f"municipios; '{VALLE}' son los diez (por defecto: {POR_DEFECTO})")
+    cual.add_argument("--valle", action="store_true",
+                      help="usar la red del valle completo (los diez municipios)")
     cual.add_argument("--red", type=Path, metavar="NET_XML", help="usar este .net.xml")
     cual.add_argument("--reticula", action="store_true",
                       help="usar una reticula sintetica en vez de una red real")
@@ -115,7 +121,8 @@ def construir_parser() -> argparse.ArgumentParser:
     s.set_defaults(func=_cmd_simular)
 
     todo = sub.add_parser("todo", help="pipeline completo, en orden")
-    todo.add_argument("municipios", nargs="*", default=[POR_DEFECTO], metavar="municipio")
+    todo.add_argument("municipios", nargs="*", default=[POR_DEFECTO], metavar="municipio",
+                      help=f"municipios a incluir; '{VALLE}' son los diez (por defecto: {POR_DEFECTO})")
     todo.add_argument("--gui", action="store_true", help="terminar abriendo sumo-gui")
     todo.set_defaults(func=_cmd_todo)
 

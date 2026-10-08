@@ -42,10 +42,19 @@ def clave_red(municipios: list[Municipio]) -> str:
     return "_".join(sorted({m.clave for m in municipios}))
 
 
+VALLE = "valle"
+
+
 def buscar_municipios(textos: list[str]) -> list[Municipio]:
-    """Municipios sin repetir, en orden alfabetico de clave."""
+    """Municipios sin repetir, en orden alfabetico de clave; "valle" equivale a los diez."""
+    if any(clave_municipio(t) == VALLE for t in textos):
+        return sorted(MUNICIPIOS.values(), key=lambda m: m.clave)
     return sorted({buscar_municipio(t).clave: buscar_municipio(t) for t in textos}.values(),
                   key=lambda m: m.clave)
+
+
+def es_valle_completo(municipios: list[Municipio]) -> bool:
+    return {m.clave for m in municipios} == set(MUNICIPIOS)
 
 
 def buscar_municipio(texto: str) -> Municipio:

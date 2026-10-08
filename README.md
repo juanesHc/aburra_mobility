@@ -23,22 +23,34 @@ muestra las opciones de cada una.
 |---|---|---|
 | `extraer-encuesta` | `data/raw/Informe_*.xlsx` | 20 CSV en `data/processed/` |
 | `preparar-insumos` | `data/processed/` | `scenarios/vtypes.add.xml`, `perfil_salidas.csv`, `SUPUESTOS.md` |
-| `construir-red [municipio]` | OpenStreetMap (caché en `data/osm/`) | `scenarios/redes/<municipio>.net.xml` y `<municipio>_calidad.md` |
-| `prueba-tecnica` | red + insumos | `scenarios/prueba_tecnica/` (demanda **sintética** + `.sumocfg`) |
+| `construir-red [municipio ...]` | OpenStreetMap (caché en `data/osm/`) | `scenarios/redes/<municipios>.net.xml` y `<municipios>_calidad.md` |
+| `prueba-tecnica [--municipio ... \| --valle]` | red + insumos | `scenarios/prueba_tecnica/` (demanda **sintética** + `.sumocfg`) |
 | `simular [--gui]` | `.sumocfg` | resumen de teleports y tiempos |
-| `todo [municipio]` | — | las cinco anteriores, en orden |
+| `todo [municipio ...]` | — | las cinco anteriores, en orden |
+
+La palabra `valle` equivale a los diez municipios:
+
+```powershell
+python main.py construir-red valle
+python main.py prueba-tecnica --valle
+python main.py simular --gui
+```
 
 `extraer-encuesta` lee las 22 hojas del informe y las normaliza, con chequeos que
 fallan ruidosamente si el formato cambia. `preparar-insumos` deriva los insumos de
 SUMO que el informe permite construir honestamente.
 
 `construir-red` descarga la red con `osmGet.py`, la convierte con `netconvert`,
-poda lo que no es ruteable y escribe un reporte de calidad. `--descargar` fuerza
-una descarga nueva, `--osm ARCHIVO` usa un archivo local y `--adivinar-semaforos`
-activa `tls.guess`.
+poda lo que no es ruteable y escribe un reporte de calidad. Con varios municipios
+los convierte juntos en una sola red, con las fronteras conectadas. La descarga se
+hace en tres partes por municipio (arterias, locales y servicio) que se guardan por
+separado: si Overpass falla, al repetir el comando solo se piden las partes que
+faltan. `--descargar` fuerza una descarga nueva, `--osm ARCHIVO` usa un archivo
+local y `--adivinar-semaforos` activa `tls.guess`.
 
-`prueba-tecnica` usa por defecto la red OSM de Sabaneta; `--red NET_XML` usa
-otra y `--reticula` una retícula sintética. Su demanda tiene perfil temporal real
+`prueba-tecnica` usa por defecto la red OSM de Sabaneta; `--municipio ...` elige
+otra red ya construida, `--valle` la del valle completo, `--red NET_XML` un archivo
+y `--reticula` una retícula sintética. Su demanda tiene perfil temporal real
 y **estructura espacial inventada**: prueba la cadena de herramientas, no modela
 Medellín.
 
@@ -49,7 +61,7 @@ Medellín.
 | Extracción del informe | Funciona | — |
 | Tipos de vehículo | Funciona, sin calibrar | Aforos |
 | Perfil horario | Funciona | — |
-| Red vial (`.net.xml`) | Funciona para Sabaneta, requiere revisión manual | Correcciones en netedit/OSM |
+| Red vial (`.net.xml`) | Completa: los diez municipios del valle, 8.525 km por sentido | Revisión visual y planes semafóricos reales |
 | Matriz OD | **Bloqueado** | Microdato EOD de AMVA |
 | Simulación SUMO | Solo prueba técnica | Los dos anteriores |
 | Impacto en red eléctrica | No empezado | Simulación |
