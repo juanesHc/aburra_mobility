@@ -27,6 +27,7 @@ muestra las opciones de cada una.
 | `prueba-tecnica [--municipio ... \| --valle]` | red + insumos | `scenarios/prueba_tecnica/` (demanda **sintética** + `.sumocfg`) |
 | `demanda [--semilla N]` | red del valle + insumos | `scenarios/demanda_od/` (matriz OD **estimada**, viajes sorteados, `.sumocfg` y reporte) |
 | `simular [--demanda] [--gui]` | `.sumocfg` | resumen de teleports y tiempos |
+| `probar [--detalle]` | `tests/` | resultado de las pruebas automáticas |
 | `todo [municipio ...]` | — | todo en orden; con `valle` simula la demanda estimada y con menos municipios la prueba técnica |
 
 La palabra `valle` equivale a los diez municipios:
@@ -113,6 +114,8 @@ src/aburra_mobility/
   red/                  municipios, descarga y conversión OSM, conectividad,
                         semáforos, reporte de calidad, retícula
   simulacion/           tipos de vehículo, .sumocfg, ejecución de SUMO
+tests/                  pruebas automáticas (python main.py probar): Furness,
+                        sorteo, zonas, conectividad y caminos más rápidos
 ```
 
 Regla de diseño: `etapas.py` orquesta y no contiene lógica de dominio; los

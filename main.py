@@ -84,6 +84,16 @@ def _cmd_todo(a):
     return None
 
 
+def _cmd_probar(a):
+    import unittest
+
+    etapas.titulo("PRUEBAS")
+    suite = unittest.defaultTestLoader.discover(str(rutas.RAIZ / "tests"),
+                                                top_level_dir=str(rutas.RAIZ))
+    resultado = unittest.TextTestRunner(stream=sys.stdout, verbosity=2 if a.detalle else 1).run(suite)
+    return 0 if resultado.wasSuccessful() else 1
+
+
 def _cmd_limpiar(a):
     etapas.limpiar()
     return None
@@ -158,6 +168,10 @@ def construir_parser() -> argparse.ArgumentParser:
                       help=f"municipios a incluir; '{VALLE}' son los diez (por defecto: {POR_DEFECTO})")
     todo.add_argument("--gui", action="store_true", help="terminar abriendo sumo-gui")
     todo.set_defaults(func=_cmd_todo)
+
+    pr = sub.add_parser("probar", help="corre las pruebas automaticas de tests/")
+    pr.add_argument("--detalle", action="store_true", help="mostrar el nombre de cada prueba")
+    pr.set_defaults(func=_cmd_probar)
 
     sub.add_parser("limpiar", help="borra lo regenerable (no toca data/raw)"
                    ).set_defaults(func=_cmd_limpiar)
