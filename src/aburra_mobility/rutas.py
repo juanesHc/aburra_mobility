@@ -8,6 +8,7 @@ DATOS = RAIZ / "data"
 RAW = DATOS / "raw"
 PROCESADOS = DATOS / "processed"
 OSM = DATOS / "osm"
+LIMITES_ZONAS = OSM / "limites_zonas.json"
 
 INFORME = RAW / "Informe_Movilidad_AMVA_20260827.xlsx"
 
@@ -18,6 +19,7 @@ SUPUESTOS = ESCENARIOS / "SUPUESTOS.md"
 
 REDES = ESCENARIOS / "redes"
 PRUEBA_TECNICA = ESCENARIOS / "prueba_tecnica"
+DEMANDA_OD = ESCENARIOS / "demanda_od"
 
 
 def red_municipio(clave: str) -> Path:

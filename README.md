@@ -25,7 +25,8 @@ muestra las opciones de cada una.
 | `preparar-insumos` | `data/processed/` | `scenarios/vtypes.add.xml`, `perfil_salidas.csv`, `SUPUESTOS.md` |
 | `construir-red [municipio ...]` | OpenStreetMap (caché en `data/osm/`) | `scenarios/redes/<municipios>.net.xml` y `<municipios>_calidad.md` |
 | `prueba-tecnica [--municipio ... \| --valle]` | red + insumos | `scenarios/prueba_tecnica/` (demanda **sintética** + `.sumocfg`) |
-| `simular [--gui]` | `.sumocfg` | resumen de teleports y tiempos |
+| `demanda [--semilla N]` | red del valle + insumos | `scenarios/demanda_od/` (matriz OD **estimada**, viajes sorteados, `.sumocfg` y reporte) |
+| `simular [--demanda] [--gui]` | `.sumocfg` | resumen de teleports y tiempos |
 | `todo [municipio ...]` | — | las cinco anteriores, en orden |
 
 La palabra `valle` equivale a los diez municipios:
@@ -54,6 +55,22 @@ y `--reticula` una retícula sintética. Su demanda tiene perfil temporal real
 y **estructura espacial inventada**: prueba la cadena de herramientas, no modela
 Medellín.
 
+`demanda` reparte los viajes entre zonas con un modelo gravitacional
+doblemente restringido balanceado con Furness. Usa los viajes que salen y
+llegan a cada macrozona, el perfil horario del privado y los tiempos de viaje
+sobre la red. Hay 30 zonas: las 21 de Medellín (comunas y corregimientos, con
+su límite de OSM) y un bloque por cada uno de los otros municipios, porque OSM
+no tiene sus subdivisiones. La matriz esperada es fija. Cada `--semilla` sortea
+una demanda distinta (Poisson por par y hora, calle y segundo de salida con
+`od2trips`), y la misma semilla repite la corrida. `--escala` (por defecto 2 %)
+y `--desde`/`--hasta` (por defecto 5 a 10) fijan cuánto se simula. β no está
+calibrado: ver `scenarios/demanda_od/demanda_od.md`.
+
+```powershell
+python main.py demanda --semilla 1
+python main.py simular --demanda
+```
+
 ## Qué falta
 
 | Pieza | Estado | Depende de |
@@ -62,14 +79,15 @@ Medellín.
 | Tipos de vehículo | Funciona, sin calibrar | Aforos |
 | Perfil horario | Funciona | — |
 | Red vial (`.net.xml`) | Completa: los diez municipios del valle, 8.525 km por sentido | Revisión visual y planes semafóricos reales |
-| Matriz OD | **Bloqueado** | Microdato EOD de AMVA |
-| Simulación SUMO | Solo prueba técnica | Los dos anteriores |
+| Matriz OD | Estimada (gravitacional + Furness, β sin calibrar); la observada está **bloqueada** | Microdato EOD de AMVA; polígonos de las 67 macrozonas |
+| Simulación SUMO | Prueba técnica y demanda estimada a escala | Los dos anteriores |
 | Impacto en red eléctrica | No empezado | Simulación |
 
 El bloqueante real es el microdato. El informe agregado trae marginales de
 origen y destino por separado, no la matriz conjunta, y esta no es recuperable
-desde aquellas. Ver `src/aburra_mobility/demanda/matriz_od.py`, que define la
-interfaz donde encajará cuando llegue.
+desde aquellas. `demanda/gravitacional.py` estima una con un modelo, y
+`demanda/matriz_od.py` define la interfaz donde encajará la observada cuando
+llegue.
 
 ## Estructura
 
@@ -81,6 +99,7 @@ data/osm/               caché de descargas de OpenStreetMap
 scenarios/              todo lo que consume SUMO (se regenera)
   redes/                redes viales y sus reportes de calidad
   prueba_tecnica/       demanda sintética y configuración de prueba
+  demanda_od/           matriz OD estimada, viajes sorteados y su reporte
 src/aburra_mobility/
   etapas.py             el pipeline: una función por etapa, en orden
   rutas.py              todas las rutas de archivos del proyecto
@@ -88,7 +107,9 @@ src/aburra_mobility/
   supuestos.py          registro de supuestos y SUPUESTOS.md
   errores.py            ErrorPipeline: los módulos lanzan, main.py informa
   encuesta/             lectura del informe agregado
-  demanda/              matriz OD (interfaz), perfil horario, demanda sintética
+  demanda/              matriz OD (interfaz y modelo gravitacional), tiempos entre
+                        zonas, sorteo de viajes, perfil horario, demanda sintética
+  zonas/                zonas del modelo, sus límites en OSM y archivo TAZ
   red/                  municipios, descarga y conversión OSM, conectividad,
                         semáforos, reporte de calidad, retícula
   simulacion/           tipos de vehículo, .sumocfg, ejecución de SUMO

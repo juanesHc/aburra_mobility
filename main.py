@@ -50,9 +50,17 @@ def _cmd_prueba(a):
     return "simular"
 
 
+def _cmd_demanda(a):
+    etapas.demanda_od(_red_elegida(a), a.beta, a.escala, a.desde, a.hasta, a.semilla)
+    return "simular --demanda"
+
+
 def _cmd_simular(a):
-    etapas.simular(gui=a.gui)
-    return None if a.gui else "simular --gui   (para verla)"
+    cfg = rutas.DEMANDA_OD / "demanda_od.sumocfg" if a.demanda else None
+    etapas.simular(cfg, gui=a.gui)
+    if a.gui:
+        return None
+    return "simular --demanda --gui   (para verla)" if a.demanda else "simular --gui   (para verla)"
 
 
 def _cmd_todo(a):
@@ -116,8 +124,26 @@ def construir_parser() -> argparse.ArgumentParser:
                       help="usar una reticula sintetica en vez de una red real")
     t.set_defaults(func=_cmd_prueba)
 
+    dm = sub.add_parser("demanda", help="matriz OD estimada (gravitacional + Furness) y "
+                                        "sorteo de viajes con una semilla")
+    dm.set_defaults(municipio=None, valle=True, red=None, reticula=False)
+    dm.add_argument("--red", type=Path, metavar="NET_XML",
+                    help="usar este .net.xml (por defecto: la red del valle)")
+    dm.add_argument("--semilla", type=int, default=1,
+                    help="semilla del sorteo de viajes (por defecto: 1)")
+    dm.add_argument("--escala", type=float, default=0.02,
+                    help="fraccion de los vehiculos reales a simular (por defecto: 0.02)")
+    dm.add_argument("--desde", type=int, default=5, help="hora de inicio (por defecto: 5)")
+    dm.add_argument("--hasta", type=int, default=10, help="hora de fin (por defecto: 10)")
+    dm.add_argument("--beta", type=float,
+                    help="sensibilidad al tiempo de viaje, por minuto "
+                         "(por defecto: BETA de demanda/gravitacional.py)")
+    dm.set_defaults(func=_cmd_demanda)
+
     s = sub.add_parser("simular", help="corre SUMO y resume teleports y tiempos")
     s.add_argument("--gui", action="store_true", help="abrir en sumo-gui en vez de correr")
+    s.add_argument("--demanda", action="store_true",
+                   help="simular la demanda estimada en vez de la prueba tecnica")
     s.set_defaults(func=_cmd_simular)
 
     todo = sub.add_parser("todo", help="pipeline completo, en orden")

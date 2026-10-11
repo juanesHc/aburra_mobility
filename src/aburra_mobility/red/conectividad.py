@@ -18,7 +18,7 @@ class Conectividad:
     fuera_del_principal: set[str]
 
 
-def _grafo_autos(net) -> dict[str, set[str]]:
+def grafo_autos(net) -> dict[str, set[str]]:
     """Grafo arista -> aristas siguientes, solo por conexiones que un auto puede usar."""
     sig = {}
     for e in net.getEdges():
@@ -97,7 +97,7 @@ def componentes_fuertes(sig) -> list[set[str]]:
 
 def analizar_conectividad(net) -> Conectividad:
     """Decide que aristas se conservan."""
-    sig = _grafo_autos(net)
+    sig = grafo_autos(net)
     inv = _invertir(sig)
     debiles = componentes_debiles(sig)
     fuertes = componentes_fuertes(sig)

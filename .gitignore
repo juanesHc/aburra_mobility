@@ -15,7 +15,9 @@ data/processed/*
 *.osm.xml.gz
 data/osm/
 *.log
-scenarios/prueba_tecnica/*_estadisticas.xml
+scenarios/*/*_estadisticas.xml
+*.taz.xml
+scenarios/demanda_od/vehiculos_por_hora.xml
 output/
 # Excepcion: los tipos de vehiculo son chicos y son decisiones de modelado.
 !*.add.xml
