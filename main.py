@@ -8,6 +8,8 @@ from aburra_mobility import entorno, etapas, rutas
 from aburra_mobility.errores import ErrorPipeline
 from aburra_mobility.red.municipios import POR_DEFECTO, VALLE, buscar_municipios, clave_red, es_valle_completo
 
+SEMILLA, ESCALA, DESDE, HASTA = 1, 0.02, 5, 10
+
 
 def _cmd_verificar(a):
     etapas.titulo("VERIFICACION DEL ENTORNO")
@@ -67,13 +69,16 @@ def _cmd_todo(a):
     etapas.extraer_encuesta()
     etapas.preparar_insumos()
     red = etapas.construir_red(a.municipios)
-    etapas.prueba_tecnica(red)
-    etapas.simular(gui=a.gui)
+    if es_valle_completo(buscar_municipios(a.municipios)):
+        cfg = etapas.demanda_od(red, None, ESCALA, DESDE, HASTA, SEMILLA)
+    else:
+        cfg = etapas.prueba_tecnica(red)
+    etapas.simular(cfg, gui=a.gui)
     etapas.titulo("PIPELINE COMPLETO")
     print(f"  CSV:        {rutas.PROCESADOS}")
     print(f"  Insumos:    {rutas.ESCENARIOS}")
     print(f"  Red:        {red}")
-    print(f"  Escenario:  {rutas.PRUEBA_TECNICA}")
+    print(f"  Escenario:  {cfg.parent}")
     print("\nAntes de usar cualquier resultado, lee scenarios/SUPUESTOS.md y el")
     print(f"reporte de calidad de la red ({red.name.removesuffix('.net.xml')}_calidad.md).")
     return None
@@ -129,12 +134,14 @@ def construir_parser() -> argparse.ArgumentParser:
     dm.set_defaults(municipio=None, valle=True, red=None, reticula=False)
     dm.add_argument("--red", type=Path, metavar="NET_XML",
                     help="usar este .net.xml (por defecto: la red del valle)")
-    dm.add_argument("--semilla", type=int, default=1,
-                    help="semilla del sorteo de viajes (por defecto: 1)")
-    dm.add_argument("--escala", type=float, default=0.02,
-                    help="fraccion de los vehiculos reales a simular (por defecto: 0.02)")
-    dm.add_argument("--desde", type=int, default=5, help="hora de inicio (por defecto: 5)")
-    dm.add_argument("--hasta", type=int, default=10, help="hora de fin (por defecto: 10)")
+    dm.add_argument("--semilla", type=int, default=SEMILLA,
+                    help="semilla del sorteo de viajes (por defecto: %(default)s)")
+    dm.add_argument("--escala", type=float, default=ESCALA,
+                    help="fraccion de los vehiculos reales a simular (por defecto: %(default)s)")
+    dm.add_argument("--desde", type=int, default=DESDE,
+                    help="hora de inicio (por defecto: %(default)s)")
+    dm.add_argument("--hasta", type=int, default=HASTA,
+                    help="hora de fin (por defecto: %(default)s)")
     dm.add_argument("--beta", type=float,
                     help="sensibilidad al tiempo de viaje, por minuto "
                          "(por defecto: BETA de demanda/gravitacional.py)")

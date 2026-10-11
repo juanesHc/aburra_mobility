@@ -54,8 +54,6 @@ def _leer_estadisticas(xml: Path) -> Estadisticas:
 
 def correr_sumo(sumocfg: Path) -> Estadisticas:
     """Corre la simulacion sin interfaz y devuelve sus estadisticas."""
-    if not sumocfg.exists():
-        raise ErrorPipeline(f"no existe {sumocfg}\nCorre primero: python main.py prueba-tecnica")
     stats = sumocfg.with_name(sumocfg.stem + "_estadisticas.xml")
     log = sumocfg.with_name(sumocfg.stem + "_sumo.log")
     r = subprocess.run(["sumo", "-c", sumocfg.name, "--statistic-output", stats.name],

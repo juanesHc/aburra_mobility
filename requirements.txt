@@ -1,19 +1,16 @@
-# Dependencias del pipeline de extraccion.
+# Dependencias del pipeline.
 # Instalar con:  pip install -r requirements.txt
 
 pandas>=2.0
+numpy>=1.26
 openpyxl>=3.1
 
-# Red vial (python main.py construir-red). sumolib se usa desde SUMO_HOME/tools, que ya viene
-# con SUMO; pyproj lo necesita sumolib para pasar de lon/lat a coordenadas de
-# la red al cruzar los semaforos de OSM con los de la red.
+# sumolib se usa desde SUMO_HOME/tools, que ya viene con SUMO; pyproj lo necesita
+# sumolib para pasar entre lon/lat y coordenadas de la red (semaforos de OSM y
+# asignacion de calles a zonas).
 pyproj>=3.6
 
-# --- Para la fase de simulacion (todavia no hace falta) ---
-# Descomentar cuando se empiece a trabajar con SUMO.
-# La version va FIJA: los resultados de simulacion no son estables entre
-# versiones, asi que todos deben correr exactamente la misma.
-#
-# eclipse-sumo==1.27.1
-# sumolib==1.27.1
-# traci==1.27.1
+# SUMO no se instala con pip en este proyecto: se usa la instalacion de Windows
+# con SUMO_HOME definido. La version va FIJA (1.27.1): los resultados de
+# simulacion no son estables entre versiones, asi que todos deben correr la misma.
+# Se revisa con: python main.py verificar

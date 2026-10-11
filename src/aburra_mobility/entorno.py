@@ -12,6 +12,7 @@ from . import rutas
 from .errores import ErrorPipeline
 
 VERSION_SUMO = "1.27.1"
+HERRAMIENTAS_SUMO = ["sumo-gui", "netconvert", "netgenerate", "od2trips"]
 
 
 def sumo_home() -> Path:
@@ -69,7 +70,7 @@ def verificar() -> bool:
         print("     Funciona igual, pero conviene activarlo:")
         print("     venv\\Scripts\\Activate.ps1   (Windows)")
 
-    for paquete in ["pandas", "openpyxl", "pyproj"]:
+    for paquete in ["pandas", "numpy", "openpyxl", "pyproj"]:
         try:
             mod = __import__(paquete)
             print(f"\n[OK] {paquete} {getattr(mod, '__version__', '')}")
@@ -91,6 +92,12 @@ def verificar() -> bool:
         if VERSION_SUMO not in version:
             print(f"     AVISO: el proyecto fija SUMO {VERSION_SUMO}; los resultados "
                   "pueden diferir con otra version.")
+        faltan = [h for h in HERRAMIENTAS_SUMO if shutil.which(h) is None]
+        if faltan:
+            print(f"[--] no estan en el PATH: {', '.join(faltan)}")
+            problemas.append(f"Faltan herramientas de SUMO: {', '.join(faltan)}")
+        else:
+            print(f"[OK] {', '.join(HERRAMIENTAS_SUMO)}")
         try:
             sumo_home()
             habilitar_sumolib()

@@ -27,7 +27,7 @@ muestra las opciones de cada una.
 | `prueba-tecnica [--municipio ... \| --valle]` | red + insumos | `scenarios/prueba_tecnica/` (demanda **sintética** + `.sumocfg`) |
 | `demanda [--semilla N]` | red del valle + insumos | `scenarios/demanda_od/` (matriz OD **estimada**, viajes sorteados, `.sumocfg` y reporte) |
 | `simular [--demanda] [--gui]` | `.sumocfg` | resumen de teleports y tiempos |
-| `todo [municipio ...]` | — | las cinco anteriores, en orden |
+| `todo [municipio ...]` | — | todo en orden; con `valle` simula la demanda estimada y con menos municipios la prueba técnica |
 
 La palabra `valle` equivale a los diez municipios:
 
