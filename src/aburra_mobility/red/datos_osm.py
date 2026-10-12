@@ -32,6 +32,7 @@ class ResumenOSM:
     restricciones: Counter = field(default_factory=Counter)
     vias_por_tipo: Counter = field(default_factory=Counter)
     vias_con_turn_lanes: Counter = field(default_factory=Counter)
+    vias_sin_cambio_de_carril: set[str] = field(default_factory=set)
     vias_por_archivo: dict[str, set[str]] = field(default_factory=dict)
 
 
@@ -88,6 +89,8 @@ def _leer_archivo(osm: Path, r: ResumenOSM, senal_por_id, vistos, vias_del_archi
                 r.vias_por_tipo[tipo] += 1
                 if any(k.startswith("turn:lanes") for k in tags):
                     r.vias_con_turn_lanes[tipo] += 1
+                if any(k.startswith("change") and ("no" in v or "only" in v) for k, v in tags.items()):
+                    r.vias_sin_cambio_de_carril.add(el.get("id"))
         elif tags.get("type") == "restriction":
             r.restricciones[tags.get("restriction", "?")] += 1
         el.clear()

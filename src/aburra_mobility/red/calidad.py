@@ -297,6 +297,11 @@ def _seccion_giros(d: DatosReporte) -> list[str]:
     L += ["Flechas de giro por carril (`turn:lanes`) en OSM, por tipo de vía:", ""]
     L += _tabla(["tipo", "vías con turn:lanes", "vías del tipo"],
                 [[t, tl[t], vt[t]] for t in sorted(vt, key=lambda t: -vt[t]) if vt[t] >= 5])
+    sin_cambio = d.resumen_osm.vias_sin_cambio_de_carril
+    if sin_cambio:
+        L += [f"**{len(sin_cambio)} vías** traen en OSM prohibición de cambiar de carril "
+              "(`change:lanes`). Se descartan: ver el supuesto `cambio_de_carril_permitido`.", ""]
+        L += _enlaces_osm(sorted(sin_cambio, key=int), "way", maximo=30)
     return L
 
 
@@ -529,5 +534,14 @@ def supuestos_red(adivinar_semaforos: bool) -> RegistroSupuestos:
         "Desde el tercero no se habilitan. Esto aproxima como se conduce en el "
         "valle (por ejemplo, la Rotonda de Laureles); no viene de un dato y "
         "habria que confirmarlo con las señales y marcas viales reales.",
+    )
+    s.agregar(
+        "cambio_de_carril_permitido",
+        "Se descartan las prohibiciones de cambio de carril de OSM (change:lanes). "
+        "Suelen estar puestas en toda la via aunque la linea continua solo cubra un "
+        "tramo, y el ruteo de SUMO no las tiene en cuenta: arma rutas que exigen "
+        "pasarse de carril donde no se puede y el vehiculo queda detenido hasta que "
+        "se teletransporta (paso en la Carrera 44). Se pierde la restriccion en los "
+        "tramos donde si existe.",
     )
     return s

@@ -43,6 +43,8 @@ def opciones_netconvert(adivinar_semaforos: bool) -> list[str]:
 
         "--no-turnarounds.except-deadend",
 
+        "--ignore-change-restrictions", "all",
+
         "--osm.turn-lanes",
         "--osm.annotate-defaults",
 

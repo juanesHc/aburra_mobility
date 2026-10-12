@@ -249,3 +249,7 @@ Se eliminan las aristas que no estan en ningun camino que pase por el componente
 ### 10. `salidas_glorieta`
 
 En las glorietas de dos o mas carriles, las salidas que netconvert solo permite desde el carril exterior se habilitan tambien desde el segundo. Desde el tercero no se habilitan. Esto aproxima como se conduce en el valle (por ejemplo, la Rotonda de Laureles); no viene de un dato y habria que confirmarlo con las señales y marcas viales reales.
+
+### 11. `cambio_de_carril_permitido`
+
+Se descartan las prohibiciones de cambio de carril de OSM (change:lanes). Suelen estar puestas en toda la via aunque la linea continua solo cubra un tramo, y el ruteo de SUMO no las tiene en cuenta: arma rutas que exigen pasarse de carril donde no se puede y el vehiculo queda detenido hasta que se teletransporta (paso en la Carrera 44). Se pierde la restriccion en los tramos donde si existe.

@@ -531,6 +531,11 @@ Flechas de giro por carril (`turn:lanes`) en OSM, por tipo de vía:
 | platform | 0 | 28 |
 | living_street | 0 | 19 |
 
+**43 vías** traen en OSM prohibición de cambiar de carril (`change:lanes`). Se descartan: ver el supuesto `cambio_de_carril_permitido`.
+
+- [36972068](https://www.openstreetmap.org/way/36972068), [182956554](https://www.openstreetmap.org/way/182956554), [352164349](https://www.openstreetmap.org/way/352164349), [352164351](https://www.openstreetmap.org/way/352164351), [352164353](https://www.openstreetmap.org/way/352164353), [352164355](https://www.openstreetmap.org/way/352164355), [361743383](https://www.openstreetmap.org/way/361743383), [365878600](https://www.openstreetmap.org/way/365878600), [512846143](https://www.openstreetmap.org/way/512846143), [512846167](https://www.openstreetmap.org/way/512846167), [569999980](https://www.openstreetmap.org/way/569999980), [570370389](https://www.openstreetmap.org/way/570370389), [570370393](https://www.openstreetmap.org/way/570370393), [570370397](https://www.openstreetmap.org/way/570370397), [570370399](https://www.openstreetmap.org/way/570370399), [570370401](https://www.openstreetmap.org/way/570370401), [570370407](https://www.openstreetmap.org/way/570370407), [570370409](https://www.openstreetmap.org/way/570370409), [570370411](https://www.openstreetmap.org/way/570370411), [570370414](https://www.openstreetmap.org/way/570370414), [570370417](https://www.openstreetmap.org/way/570370417), [571057379](https://www.openstreetmap.org/way/571057379), [571092089](https://www.openstreetmap.org/way/571092089), [571108744](https://www.openstreetmap.org/way/571108744), [571387671](https://www.openstreetmap.org/way/571387671), [571458592](https://www.openstreetmap.org/way/571458592), [571757651](https://www.openstreetmap.org/way/571757651), [571757653](https://www.openstreetmap.org/way/571757653), [571757654](https://www.openstreetmap.org/way/571757654), [571809765](https://www.openstreetmap.org/way/571809765)
+- … y 13 más
+
 ## Componentes desconectados
 
 Calculado sobre la red **antes de podar**, con las conexiones que puede usar
@@ -659,3 +664,7 @@ Se eliminan las aristas que no estan en ningun camino que pase por el componente
 ### 10. `salidas_glorieta`
 
 En las glorietas de dos o mas carriles, las salidas que netconvert solo permite desde el carril exterior se habilitan tambien desde el segundo. Desde el tercero no se habilitan. Esto aproxima como se conduce en el valle (por ejemplo, la Rotonda de Laureles); no viene de un dato y habria que confirmarlo con las señales y marcas viales reales.
+
+### 11. `cambio_de_carril_permitido`
+
+Se descartan las prohibiciones de cambio de carril de OSM (change:lanes). Suelen estar puestas en toda la via aunque la linea continua solo cubra un tramo, y el ruteo de SUMO no las tiene en cuenta: arma rutas que exigen pasarse de carril donde no se puede y el vehiculo queda detenido hasta que se teletransporta (paso en la Carrera 44). Se pierde la restriccion en los tramos donde si existe.
